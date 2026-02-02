@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Design Editor Prototype</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    />
+  </head>
+
+  <body class="bg-gray-100 h-screen overflow-hidden">
+    <!-- TOP BAR -->
+    <header
+      class="h-14 bg-gradient-to-r from-cyan-500 to-purple-600 flex items-center justify-between px-4 text-white"
+    >
+      <div class="flex items-center gap-3">
+        <!-- Menu -->
+        <button class="hover:bg-white/20 active:bg-white/30 px-3 py-2 rounded">
+          <i data-lucide="menu" class="w-5 h-5"></i>
+        </button>
+
+        <!-- File -->
+        <span class="font-medium">File</span>
+
+        <!-- Edit + dropdown -->
+        <button
+          class="flex items-center gap-1 hover:bg-white/20 active:bg-white/30 px-2 py-1 rounded font-medium"
+        >
+          <i data-lucide="pencil" class="w-4 h-4"></i>
+          <span>Edit</span>
+          <i data-lucide="chevron-down" class="w-4 h-4"></i>
+        </button>
+
+        <!-- Undo -->
+        <button class="hover:bg-white/20 active:bg-white/30 p-2 rounded">
+          <i data-lucide="undo-2" class="w-5 h-5"></i>
+        </button>
+
+        <!-- Redo -->
+        <button class="hover:bg-white/20 active:bg-white/30 p-2 rounded">
+          <i data-lucide="redo-2" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Center -->
+      <div class="flex items-center gap-3"></div>
+
+      <!-- Right -->
+      <div class="flex items-center gap-3">
+        <div
+          class="w-8 h-8 rounded-full bg-purple-700 text-white flex items-center justify-center font-semibold border-2 border-white"
+        >
+          C
+        </div>
+        <button
+          class="flex items-center bg-white hover:bg-gray-100 text-purple-700 px-4 py-1 gap-2 rounded"
+        >
+          <i data-lucide="share-2" class="w-4 h-4"></i>
+          <span>Bagikan</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <div class="flex h-[calc(100vh-56px-40px)]">
+      <!-- SIDEBAR -->
+      <aside
+        class="w-20 bg-gray-200 border-r flex flex-col items-center py-4 pt-6 gap-9 text-gray-600"
+      >
+        <button
+          class="flex flex-col items-center text-xs hover:text-purple-600 active:scale-95"
+        >
+          <i data-lucide="layout-template" class="w-7 h-7"></i>
+          <span class="pt-2">Desain</span>
+        </button>
+
+        <button
+          class="flex flex-col items-center text-xs hover:text-purple-600 active:scale-95"
+        >
+          <i data-lucide="layout-grid" class="w-7 h-7"></i>
+          <span class="pt-2">Elemen</span>
+        </button>
+
+        <button
+          class="flex flex-col items-center text-xs hover:text-purple-600 active:scale-95"
+        >
+          <i data-lucide="type" class="w-7 h-7"></i>
+          <span class="pt-2">Teks</span>
+        </button>
+
+        <button
+          class="flex flex-col items-center text-xs hover:text-purple-600 active:scale-95"
+        >
+          <i data-lucide="cloud-upload" class="w-7 h-7"></i>
+          <span class="pt-2">Unggahan</span>
+        </button>
+
+        <button
+          class="flex flex-col items-center text-xs hover:text-purple-600 active:scale-95"
+        >
+          <i data-lucide="pen-tool" class="w-7 h-7"></i>
+          <span class="pt-2">Alat</span>
+        </button>
+
+        <button
+          class="flex flex-col items-center text-xs hover:text-purple-600 active:scale-95"
+        >
+          <i data-lucide="folder" class="w-7 h-7"></i>
+          <span class="pt-2">Proyek</span>
+        </button>
+      </aside>
+
+      <main class="flex-1 bg-gray-200 overflow-hidden relative">
+        <!-- Canvas wrapper -->
+        <div
+          id="canvasWrapper"
+          class="absolute inset-0 cursor-grab active:cursor-grabbing"
+        >
+          <!-- Artboard -->
+          <div
+            id="artboard"
+            class="bg-white w-[800px] h-[450px] shadow-lg rounded absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+          ></div>
+        </div>
+      </main>
+    </div>
+
+    <!-- BOTTOM BAR -->
+    <footer
+      class="h-10 bg-gray-200 border-t flex items-center justify-end px-4 gap-2 text-sm text-gray-600"
+    >
+      <!-- Center: Zoom -->
+      <div class="flex items-center gap-3">
+        <div class="w-40 h-1 bg-gray-300 rounded relative">
+          <div
+            class="absolute left-1/2 -translate-x-1/2 -top-1 w-4 h-4 bg-white border rounded-full shadow cursor-pointer"
+          ></div>
+        </div>
+        <span>50%</span>
+      </div>
+
+      <!-- Right: Page info & fullscreen -->
+      <div class="flex items-center gap-4">
+        <span>Halaman 1/1</span>
+        <button class="hover:bg-gray-200 active:bg-gray-300 p-1 rounded">
+          <i data-lucide="maximize" class="w-4 h-4"></i>
+        </button>
+      </div>
+    </footer>
+
+    <script>
+      lucide.createIcons();
+
+      const wrapper = document.getElementById("canvasWrapper");
+      const artboard = document.getElementById("artboard");
+
+      let isDragging = false;
+      let startX, startY;
+      let currentX = 0;
+      let currentY = 0;
+
+      wrapper.addEventListener("mousedown", (e) => {
+        isDragging = true;
+        startX = e.clientX - currentX;
+        startY = e.clientY - currentY;
+      });
+
+      document.addEventListener("mousemove", (e) => {
+        if (!isDragging) return;
+        currentX = e.clientX - startX;
+        currentY = e.clientY - startY;
+        artboard.style.transform = `translate(${currentX}px, ${currentY}px)`;
+      });
+
+      document.addEventListener("mouseup", () => {
+        isDragging = false;
+      });
+    </script>
+  </body>
+</html>
